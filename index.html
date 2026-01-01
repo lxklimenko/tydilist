@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker 2026</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            /* Переменные цветов Telegram (адаптируются под тему пользователя) */
+            --bg-color: var(--tg-theme-bg-color, #1c1c1e);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #999999);
+            --button-color: var(--tg-theme-button-color, #2ea6ff);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            --header-bg: var(--tg-theme-header-bg-color, #1c1c1e);
+            
+            /* Твои акцентные цвета */
+            --success-green: #34c759;
+            --danger-red: #ff3b30;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Отступ для нижнего меню */
+        }
+
+        .container {
+            padding: 16px;
+            display: none; /* Скрываем все вкладки по умолчанию */
+        }
+
+        .container.active {
+            display: block; /* Показываем активную */
+        }
+
+        /* Карточки */
+        .card {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 { font-size: 20px; margin-top: 0; margin-bottom: 12px; }
+        h3 { font-size: 16px; margin-top: 0; margin-bottom: 8px; color: var(--hint-color); }
+
+        /* Элементы формы */
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Чекбоксы в стиле iOS */
+        .checkbox-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 30px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--success-green); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Прогресс бары */
+        .progress-container {
+            width: 100%;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            height: 20px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--button-color);
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            width: 0%; /* Будет меняться JS */
+            transition: width 0.5s;
+        }
+
+        /* Нижнее меню */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--header-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--secondary-bg);
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--hint-color);
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .tab-btn.active { color: var(--button-color); }
+        .tab-icon { font-size: 24px; margin-bottom: 4px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="tab-daily" class="container active">
+        <div class="card" style="text-align: center;">
+            <h3>Дней подряд</h3>
+            <h1 style="font-size: 48px; margin: 0; color: var(--success-green);">0</h1>
+            <p style="margin-bottom: 0;">Ни шагу назад!</p>
+        </div>
+
+        <div class="card">
+            <h2>Чек-лист на сегодня</h2>
+            
+            <div class="checkbox-wrapper">
+                <span>QA: учеба (20-30 мин)</span>
+                <label class="switch">
+                    <input type="checkbox" id="qaCheck">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="checkbox-wrapper">
+                <span>Деньги: действия (10-20 мин)</span>
+                <label class="switch">
+                    <input type="checkbox" id="moneyCheck">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Отчет</h2>
+            <div class="form-group">
+                <label>Комментарий / Вывод дня</label>
+                <textarea id="dailyComment" rows="3" placeholder="Что сделано?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Баланс на ипотеку (обновить)</label>
+                <input type="number" id="mortgageBalance" placeholder="₽">
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-finance" class="container">
+        <div class="card">
+            <h2>Долги (Ozon)</h2>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Остаток долга:</span>
+                <span style="font-weight: bold;">11 862 ₽</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 70%; background-color: var(--danger-red);">70%</div>
+            </div>
+            <p style="font-size: 12px; color: var(--hint-color); margin-top: 8px;">*Данные подтягиваются из таблицы</p>
+        </div>
+    </div>
+
+    <div id="tab-goals" class="container">
+        <div class="card">
+            <h2>Январь: Цель 60 000 ₽</h2>
+            
+            <label>Осн. доход + Доп. доход</label>
+            <div class="progress-container" style="height: 30px;">
+                <div class="progress-bar" style="width: 45%; background-color: var(--success-green);">27 000 ₽</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px;">
+                <span>0 ₽</span>
+                <span>60 000 ₽</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('daily', this)">
+            <span class="tab-icon">📅</span>
+            Сегодня
+        </button>
+        <button class="tab-btn" onclick="switchTab('finance', this)">
+            <span class="tab-icon">💰</span>
+            Финансы
+        </button>
+        <button class="tab-btn" onclick="switchTab('goals', this)">
+            <span class="tab-icon">🎯</span>
+            Цели
+        </button>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Развернуть на весь экран
+
+        // Настройка главной кнопки (Main Button)
+        tg.MainButton.setText("ЗАВЕРШИТЬ ДЕНЬ");
+        tg.MainButton.show();
+
+        // Логика переключения вкладок
+        function switchTab(tabId, btnElement) {
+            // Скрыть все контейнеры
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            // Показать нужный
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Обновить кнопки меню
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // Показываем кнопку "Сохранить" только на главной вкладке
+            if(tabId === 'daily') {
+                tg.MainButton.show();
+            } else {
+                tg.MainButton.hide();
+            }
+        }
+
+        // Обработка нажатия на главную кнопку Telegram
+        tg.MainButton.onClick(function() {
+            // Собираем данные
+            const data = {
+                qa_done: document.getElementById('qaCheck').checked,
+                money_done: document.getElementById('moneyCheck').checked,
+                comment: document.getElementById('dailyComment').value,
+                mortgage: document.getElementById('mortgageBalance').value,
+                user_id: tg.initDataUnsafe.user?.id
+            };
+
+            // ! ЗДЕСЬ БУДЕТ ОТПРАВКА ДАННЫХ В N8N !
+            // fetch('ТВОЙ_ВЕБХУК_N8N', { method: 'POST', body: JSON.stringify(data) })
+            
+            // Пока просто покажем алерт для теста
+            tg.showPopup({
+                title: 'Тест',
+                message: `Данные собраны!\nQA: ${data.qa_done}\nКоммент: ${data.comment}`,
+                buttons: [{type: 'ok'}]
+            });
+        });
+
+    </script>
+</body>
+</html>
