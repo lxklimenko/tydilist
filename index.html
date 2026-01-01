@@ -239,15 +239,15 @@
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
+        // 1. Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand(); // Развернуть на весь экран
 
-        // Настройка главной кнопки (Main Button)
+        // 2. Настройка главной кнопки (Main Button)
         tg.MainButton.setText("ЗАВЕРШИТЬ ДЕНЬ");
-        tg.MainButton.show();
+        tg.MainButton.show(); // <--- ВОТ ЭТА КОМАНДА ВКЛЮЧАЕТ КНОПКУ
 
-        // Логика переключения вкладок
+        // 3. Логика переключения вкладок
         function switchTab(tabId, btnElement) {
             // Скрыть все контейнеры
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
@@ -258,7 +258,7 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             btnElement.classList.add('active');
 
-            // Показываем кнопку "Сохранить" только на главной вкладке
+            // Показываем кнопку "Завершить день" ТОЛЬКО на главной вкладке
             if(tabId === 'daily') {
                 tg.MainButton.show();
             } else {
@@ -266,9 +266,12 @@
             }
         }
 
-        // Обработка нажатия на главную кнопку Telegram
+        // 4. Обработка нажатия на главную кнопку (Отправка в n8n)
         tg.MainButton.onClick(function() {
-            // Собираем данные
+            // Блокируем кнопку и показываем прогресс, чтобы не нажали дважды
+            tg.MainButton.showProgress();
+
+            // Собираем данные из полей
             const data = {
                 qa_done: document.getElementById('qaCheck').checked,
                 money_done: document.getElementById('moneyCheck').checked,
@@ -277,15 +280,10 @@
                 user_id: tg.initDataUnsafe.user?.id
             };
 
-            // ! ЗДЕСЬ БУДЕТ ОТПРАВКА ДАННЫХ В N8N !
-            // fetch('ТВОЙ_ВЕБХУК_N8N', { method: 'POST', body: JSON.stringify(data) })
-            
-            // Пока просто покажем алерт для теста
-            // Блокируем кнопку и показываем прогресс
-            tg.MainButton.showProgress();
+            // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ N8N НИЖЕ ВНУТРИ КАВЫЧЕК ⚠️
+            const webhookUrl = https://klimenkoa.ru/webhook-test/tracker2026; 
 
-            // Отправляем данные на Webhook
-            fetch(https://klimenkoa.ru/webhook-test/tracker2026, { 
+            fetch(webhookUrl, { 
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json'
@@ -294,22 +292,25 @@
             })
             .then(response => {
                 if (response.ok) {
+                    // Успех
                     tg.showPopup({
                         title: 'Успех', 
                         message: 'Данные записаны в таблицу!', 
                         buttons: [{type: 'ok'}]
                     });
-                    tg.close(); // Закрыть приложение
+                    tg.close(); // Закрываем приложение
                 } else {
-                    tg.showPopup({title: 'Ошибка', message: 'Сервер n8n не ответил', buttons: [{type: 'ok'}]});
+                    // Ошибка сервера
+                    tg.showPopup({title: 'Ошибка', message: 'Сервер n8n не ответил (проверь Active)', buttons: [{type: 'ok'}]});
                     tg.MainButton.hideProgress();
                 }
             })
             .catch(error => {
-                tg.showPopup({title: 'Ошибка сети', message: error.message, buttons: [{type: 'ok'}]});
+                // Ошибка сети или ссылки
+                tg.showPopup({title: 'Ошибка сети', message: 'Проверь ссылку: ' + error.message, buttons: [{type: 'ok'}]});
                 tg.MainButton.hideProgress();
             });
-
+        });
     </script>
 </body>
 </html>
