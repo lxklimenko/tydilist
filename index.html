@@ -281,12 +281,34 @@
             // fetch('ТВОЙ_ВЕБХУК_N8N', { method: 'POST', body: JSON.stringify(data) })
             
             // Пока просто покажем алерт для теста
-            tg.showPopup({
-                title: 'Тест',
-                message: `Данные собраны!\nQA: ${data.qa_done}\nКоммент: ${data.comment}`,
-                buttons: [{type: 'ok'}]
+            // Блокируем кнопку и показываем прогресс
+            tg.MainButton.showProgress();
+
+            // Отправляем данные на Webhook
+            fetch(https://klimenkoa.ru/webhook-test/tracker2026, { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) 
+            })
+            .then(response => {
+                if (response.ok) {
+                    tg.showPopup({
+                        title: 'Успех', 
+                        message: 'Данные записаны в таблицу!', 
+                        buttons: [{type: 'ok'}]
+                    });
+                    tg.close(); // Закрыть приложение
+                } else {
+                    tg.showPopup({title: 'Ошибка', message: 'Сервер n8n не ответил', buttons: [{type: 'ok'}]});
+                    tg.MainButton.hideProgress();
+                }
+            })
+            .catch(error => {
+                tg.showPopup({title: 'Ошибка сети', message: error.message, buttons: [{type: 'ok'}]});
+                tg.MainButton.hideProgress();
             });
-        });
 
     </script>
 </body>
