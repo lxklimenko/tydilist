@@ -13,22 +13,15 @@
             --button-color: var(--tg-theme-button-color, #2ea6ff);
             --button-text-color: var(--tg-theme-button-text-color, #ffffff);
             --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
-            --header-bg: var(--tg-theme-header-bg-color, #1c1c1e);
             --success-green: #34c759;
-            --danger-red: #ff3b30;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 90px;
+            margin: 0; padding: 16px; padding-bottom: 80px;
         }
-
-        .container { padding: 16px; display: none; }
-        .container.active { display: block; }
 
         .card {
             background-color: var(--secondary-bg);
@@ -37,152 +30,120 @@
             margin-bottom: 16px;
         }
 
-        h2 { font-size: 20px; margin: 0 0 12px 0; }
-        h3 { font-size: 16px; margin: 0 0 8px 0; color: var(--hint-color); }
-
-        input[type="text"], input[type="number"], textarea {
-            width: 100%; padding: 12px; border-radius: 8px; border: none;
-            background-color: var(--bg-color); color: var(--text-color);
-            box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
-        }
-
-        /* Красивая кнопка ПРЯМО НА СТРАНИЦЕ */
-        .main-btn {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            text-align: center;
-        }
-        .main-btn:active { opacity: 0.8; }
-
-        /* Чекбоксы */
-        .checkbox-wrapper {
+        h2 { font-size: 18px; margin: 0 0 12px 0; }
+        
+        .checkbox-item {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;
         }
-        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+
+        input[type="number"], textarea {
+            width: 100%; padding: 12px; border-radius: 8px; border: none;
+            background-color: var(--bg-color); color: var(--text-color);
+            box-sizing: border-box; font-size: 16px; margin-top: 8px;
+        }
+
+        .main-btn {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            width: 100%; padding: 16px; border-radius: 12px; border: none;
+            font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
+
+        /* Переключатель (Switch) */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .4s; border-radius: 34px;
+            background-color: #3e3e40; transition: .4s; border-radius: 34px;
         }
         .slider:before {
-            position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px;
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
             background-color: white; transition: .4s; border-radius: 50%;
         }
         input:checked + .slider { background-color: var(--success-green); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        /* Меню */
-        .tab-bar {
-            position: fixed; bottom: 0; width: 100%; background-color: var(--header-bg);
-            display: flex; justify-content: space-around; padding: 10px 0;
-            border-top: 1px solid var(--secondary-bg); z-index: 100;
-        }
-        .tab-btn {
-            background: none; border: none; color: var(--hint-color);
-            font-size: 12px; display: flex; flex-direction: column; align-items: center;
-        }
-        .tab-btn.active { color: var(--button-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
     </style>
 </head>
 <body>
 
-    <div id="tab-daily" class="container active">
-        <div class="card" style="text-align: center;">
-            <h3>Дней подряд</h3>
-            <h1 style="font-size: 48px; margin: 0; color: var(--success-green);">0</h1>
-            <p style="margin: 0;">Ни шагу назад!</p>
-        </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="color: var(--hint-color); margin: 0;">Дней подряд</h3>
+        <h1 style="font-size: 48px; margin: 8px 0; color: var(--success-green);">0</h1>
+    </div>
 
-        <div class="card">
-            <h2>Чек-лист на сегодня</h2>
-            <div class="checkbox-wrapper">
-                <span>QA: учеба (20-30 мин)</span>
-                <label class="switch"><input type="checkbox" id="qaCheck"><span class="slider"></span></label>
-            </div>
-            <div class="checkbox-wrapper">
-                <span>Деньги: действия</span>
-                <label class="switch"><input type="checkbox" id="moneyCheck"><span class="slider"></span></label>
-            </div>
+    <div class="card">
+        <h2>Чек-лист на сегодня</h2>
+        <div class="checkbox-item">
+            <span>QA: учеба (20-30 мин)</span>
+            <label class="switch"><input type="checkbox" id="qaCheck"><span class="slider"></span></label>
         </div>
-
-        <div class="card">
-            <h2>Отчет</h2>
-            <textarea id="dailyComment" rows="3" placeholder="Что сделано?"></textarea>
-            <input type="number" id="mortgageBalance" placeholder="Баланс ипотеки (₽)">
-            
-            <button class="main-btn" onclick="sendData()" id="sendBtn">
-                ЗАВЕРШИТЬ ДЕНЬ
-            </button>
+        <div class="checkbox-item">
+            <span>Деньги: действия (10-20 мин)</span>
+            <label class="switch"><input type="checkbox" id="moneyCheck"><span class="slider"></span></label>
         </div>
     </div>
 
-    <div id="tab-finance" class="container"><div class="card"><h2>Финансы</h2><p>Скоро здесь будет статистика...</p></div></div>
-    <div id="tab-goals" class="container"><div class="card"><h2>Цели</h2><p>Скоро здесь будут графики...</p></div></div>
-
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('daily', this)"><span>📅</span>Сегодня</button>
-        <button class="tab-btn" onclick="switchTab('finance', this)"><span>💰</span>Финансы</button>
-        <button class="tab-btn" onclick="switchTab('goals', this)"><span>🎯</span>Цели</button>
+    <div class="card">
+        <h2>Отчет</h2>
+        <textarea id="dailyComment" rows="3" placeholder="Что сделано за день?"></textarea>
+        <input type="number" id="mortgageBalance" placeholder="Баланс на ипотеку (₽)">
+        
+        <button class="main-btn" onclick="sendData()" id="sendBtn">
+            ЗАВЕРШИТЬ ДЕНЬ
+        </button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); 
+        tg.expand();
 
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            btnElement.classList.add('active');
-        }
-
-        // Функция отправки данных
         function sendData() {
-            // Меняем текст кнопки, чтобы было понятно, что процесс идет
             const btn = document.getElementById('sendBtn');
+            const qaStatus = document.getElementById('qaCheck').checked;
+            const moneyStatus = document.getElementById('moneyCheck').checked;
+            const commentVal = document.getElementById('dailyComment').value;
+            const mortgageVal = document.getElementById('mortgageBalance').value;
+
+            // Блокируем кнопку
             btn.innerText = "⏳ Сохранение...";
             btn.disabled = true;
 
-            const data = {
-                qa_done: document.getElementById('qaCheck').checked,
-                money_done: document.getElementById('moneyCheck').checked,
-                comment: document.getElementById('dailyComment').value,
-                mortgage: document.getElementById('mortgageBalance').value,
-                user_id: tg.initDataUnsafe.user?.id || 'anonymous'
+            // Собираем данные для n8n
+            const payload = {
+                qa_done: qaStatus,
+                money_done: moneyStatus,
+                comment: commentVal,
+                mortgage: mortgageVal
             };
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ МЕЖДУ КАВЫЧЕК
-            const webhookUrl = 'https://klimenkoa.ru/webhook-test/tracker2026'; 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // ⚠️ ВАЖНО: ВСТАВЬ СВОЮ ССЫЛКУ ИЗ N8N ВМЕСТО МОЕЙ ЗАГЛУШКИ
+            const webhookUrl = 'https://klimenkoa.ru/webhook-test/tracker2026';
 
-            fetch(webhookUrl, { 
-                method: 'POST', 
+            fetch(webhookUrl, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data) 
+                body: JSON.stringify(payload)
             })
             .then(response => {
                 if (response.ok) {
-                    tg.showPopup({title: 'Успех!', message: 'Данные улетели в таблицу', buttons: [{type: 'ok'}]});
-                    btn.innerText = "✅ Готово";
+                    tg.showPopup({
+                        title: 'Успех!',
+                        message: 'Данные записаны в таблицу',
+                        buttons: [{type: 'ok'}]
+                    });
+                    btn.innerText = "✅ ГОТОВО";
                 } else {
-                    tg.showPopup({title: 'Ошибка', message: 'Сервер ответил ошибкой', buttons: [{type: 'ok'}]});
-                    btn.innerText = "Попробовать снова";
-                    btn.disabled = false;
+                    throw new Error('Ошибка сервера');
                 }
             })
             .catch(error => {
-                tg.showPopup({title: 'Ошибка сети', message: 'Неверная ссылка или нет интернета', buttons: [{type: 'ok'}]});
-                btn.innerText = "Попробовать снова";
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: 'Не удалось отправить данные. Проверь Webhook и интернет.',
+                    buttons: [{type: 'ok'}]
+                });
+                btn.innerText = "ПОПРОБОВАТЬ СНОВА";
                 btn.disabled = false;
             });
         }
