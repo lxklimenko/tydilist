@@ -138,11 +138,11 @@
             btn.disabled = true;
 
             // ЗАМЕНИ НА СВОЙ PRODUCTION URL
-            fetch('https://klimenkoa.ru/webhook/tracker2026', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
+            fetch('https://flintily-wieldier-lauralee.ngrok-free.dev/api/save', { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+})
             .then(res => {
                 if (res.ok) {
                     tg.showPopup({ title: 'Успех!', message: 'Данные в таблице', buttons: [{type: 'ok'}] });
