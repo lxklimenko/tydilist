@@ -29,52 +29,82 @@
     </style>
 </head>
 <body>
-    <div class="card" style="text-align: center;">
-        <h3 style="color: var(--hint-color); margin: 0;">Дней подряд</h3>
-        <h1 style="font-size: 48px; margin: 8px 0; color: var(--success-green);">0</h1>
-    </div>
     <div class="card">
-        <h2>Чек-лист</h2>
-        <div class="checkbox-item"><span>QA: учеба</span><label class="switch"><input type="checkbox" id="qaCheck"><span class="slider"></span></label></div>
-        <div class="checkbox-item"><span>Деньги: действия</span><label class="switch"><input type="checkbox" id="moneyCheck"><span class="slider"></span></label></div>
-    </div>
-    <div class="card">
-        <h2>Отчет</h2>
-        <textarea id="dailyComment" rows="3" placeholder="Что сделано?"></textarea>
-        <input type="number" id="mortgageBalance" placeholder="Баланс ипотеки (₽)">
-        <button class="main-btn" onclick="sendData()" id="sendBtn">ЗАВЕРШИТЬ ДЕНЬ</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="margin: 0;">Чек-лист</h2>
+            <span style="color: var(--button-color); font-size: 28px; cursor: pointer; font-weight: bold;" onclick="addNewTask()">+</span>
+        </div>
+        
+        <div id="taskList">
+            <div class="checkbox-item">
+                <span>QA: учеба</span>
+                <label class="switch"><input type="checkbox" id="qaCheck"><span class="slider"></span></label>
+            </div>
+            <div class="checkbox-item">
+                <span>Деньги: действия</span>
+                <label class="switch"><input type="checkbox" id="moneyCheck"><span class="slider"></span></label>
+            </div>
+            <div class="checkbox-item">
+                <span>Лег вовремя (до 00:00)</span>
+                <label class="switch"><input type="checkbox" id="sleepCheck"><span class="slider"></span></label>
+            </div>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Функция для добавления новых задач через "+"
+        function addNewTask() {
+            const taskName = prompt("Введите название новой задачи:");
+            if (taskName) {
+                const taskList = document.getElementById('taskList');
+                const newTaskDiv = document.createElement('div');
+                newTaskDiv.className = 'checkbox-item';
+                newTaskDiv.innerHTML = `
+                    <span>${taskName}</span>
+                    <label class="switch"><input type="checkbox" class="extra-task" data-name="${taskName}"><span class="slider"></span></label>
+                `;
+                taskList.appendChild(newTaskDiv);
+            }
+        }
+
         function sendData() {
             const btn = document.getElementById('sendBtn');
+            
+            // Собираем данные
             const payload = {
-                qa_done: document.getElementById('qaCheck').checked ? "ДА" : "НЕТ",
-                money_done: document.getElementById('moneyCheck').checked ? "ДА" : "НЕТ",
+                qa_done: document.getElementById('qaCheck').checked,
+                money_done: document.getElementById('moneyCheck').checked,
+                sleep_on_time: document.getElementById('sleepCheck').checked, // Новое поле для сна
                 comment: document.getElementById('dailyComment').value || "—",
                 mortgage: document.getElementById('mortgageBalance').value || "0"
             };
 
+            // Собираем дополнительные задачи, если они есть
+            const extras = document.querySelectorAll('.extra-task');
+            extras.forEach(task => {
+                payload[task.getAttribute('data-name')] = task.checked;
+            });
+
             btn.innerText = "⏳ Сохранение...";
             btn.disabled = true;
 
-            // ⚠️ ВАЖНО: Используй PRODUCTION URL (без -test) и держи workflow ACTIVE
+            // ТВОЯ ССЫЛКА N8N (Используй Production версию)
             fetch('https://klimenkoa.ru/webhook/tracker2026', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(res => {
-                if (res.ok) {
+            .then(response => {
+                if (response.ok) {
                     tg.showPopup({ title: 'Успех!', message: 'Данные в таблице', buttons: [{type: 'ok'}] });
                     btn.innerText = "✅ ГОТОВО";
-                } else { throw new Error('Ошибка'); }
+                } else { throw new Error(); }
             })
-            .catch(err => {
-                tg.showPopup({ title: 'Ошибка', message: 'Проверь n8n (Active должен быть ON)', buttons: [{type: 'ok'}] });
+            .catch(error => {
+                tg.showPopup({ title: 'Ошибка', message: 'Проверь n8n', buttons: [{type: 'ok'}] });
                 btn.innerText = "ПОПРОБОВАТЬ СНОВА";
                 btn.disabled = false;
             });
