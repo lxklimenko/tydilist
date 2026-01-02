@@ -15,20 +15,63 @@
             --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
             --success-green: #34c759;
         }
-        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 16px; }
-        .card { background-color: var(--secondary-bg); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .checkbox-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px; }
-        input[type="number"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; background-color: var(--bg-color); color: var(--text-color); box-sizing: border-box; font-size: 16px; margin-top: 8px; }
-        .main-btn { background-color: var(--button-color); color: var(--button-text-color); width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 16px; padding-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        h2 { font-size: 18px; margin: 0 0 12px 0; }
+        
+        .checkbox-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;
+        }
+
+        input[type="number"], textarea {
+            width: 100%; padding: 12px; border-radius: 8px; border: none;
+            background-color: var(--bg-color); color: var(--text-color);
+            box-sizing: border-box; font-size: 16px; margin-top: 8px;
+        }
+
+        .main-btn {
+            background-color: #7d96f3; /* Цвет как на твоем скриншоте */
+            color: white;
+            width: 100%; padding: 16px; border-radius: 12px; border: none;
+            font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+
+        /* Переключатель (Switch) */
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3e3e40; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #3e3e40; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
         input:checked + .slider { background-color: var(--success-green); }
         input:checked + .slider:before { transform: translateX(22px); }
     </style>
 </head>
 <body>
+
+    <div class="card" style="text-align: center;">
+        <h3 style="color: var(--hint-color); margin: 0;">Дней подряд</h3>
+        <h1 style="font-size: 48px; margin: 8px 0; color: var(--success-green);">0</h1>
+    </div>
+
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h2 style="margin: 0;">Чек-лист</h2>
@@ -51,11 +94,17 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>Отчет</h2>
+        <textarea id="dailyComment" rows="3" placeholder="Что сделано?"></textarea>
+        <input type="number" id="mortgageBalance" placeholder="Баланс ипотеки (₽)">
+        <button class="main-btn" onclick="sendData()" id="sendBtn">ЗАВЕРШИТЬ ДЕНЬ</button>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Функция для добавления новых задач через "+"
         function addNewTask() {
             const taskName = prompt("Введите название новой задачи:");
             if (taskName) {
@@ -72,40 +121,37 @@
 
         function sendData() {
             const btn = document.getElementById('sendBtn');
-            
-            // Собираем данные
             const payload = {
                 qa_done: document.getElementById('qaCheck').checked,
                 money_done: document.getElementById('moneyCheck').checked,
-                sleep_on_time: document.getElementById('sleepCheck').checked, // Новое поле для сна
+                sleep_on_time: document.getElementById('sleepCheck').checked,
                 comment: document.getElementById('dailyComment').value || "—",
                 mortgage: document.getElementById('mortgageBalance').value || "0"
             };
 
-            // Собираем дополнительные задачи, если они есть
-            const extras = document.querySelectorAll('.extra-task');
-            extras.forEach(task => {
+            // Собираем доп. задачи из кнопки "+"
+            document.querySelectorAll('.extra-task').forEach(task => {
                 payload[task.getAttribute('data-name')] = task.checked;
             });
 
             btn.innerText = "⏳ Сохранение...";
             btn.disabled = true;
 
-            // ТВОЯ ССЫЛКА N8N (Используй Production версию)
+            // ЗАМЕНИ НА СВОЙ PRODUCTION URL
             fetch('https://klimenkoa.ru/webhook/tracker2026', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(response => {
-                if (response.ok) {
+            .then(res => {
+                if (res.ok) {
                     tg.showPopup({ title: 'Успех!', message: 'Данные в таблице', buttons: [{type: 'ok'}] });
                     btn.innerText = "✅ ГОТОВО";
                 } else { throw new Error(); }
             })
-            .catch(error => {
+            .catch(err => {
                 tg.showPopup({ title: 'Ошибка', message: 'Проверь n8n', buttons: [{type: 'ok'}] });
-                btn.innerText = "ПОПРОБОВАТЬ СНОВА";
+                btn.innerText = "ЗАВЕРШИТЬ ДЕНЬ";
                 btn.disabled = false;
             });
         }
