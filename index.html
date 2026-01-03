@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TidyList - Трекер Дисциплины</title>
+    <title>TidyList</title>
     <style>
         :root {
             --bg-color: #000000;
@@ -15,112 +15,64 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 20px; margin: 0; }
-        .streak-count { font-size: 48px; font-weight: bold; color: var(--accent-green); margin: 5px 0; }
+        .header { text-align: center; margin-bottom: 25px; width: 100%; }
         .streak-label { font-size: 14px; color: var(--text-gray); }
+        .streak-count { font-size: 48px; font-weight: bold; color: var(--accent-green); }
 
         .card {
             background: var(--card-bg);
-            border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            width: 100%; max-width: 400px;
+            padding: 20px; margin-bottom: 20px;
             box-sizing: border-box;
         }
 
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; font-size: 16px; font-weight: 600;
         }
 
         .add-btn {
-            background: none;
-            border: none;
-            color: var(--btn-blue);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0 10px;
+            background: none; border: none; color: var(--btn-blue);
+            font-size: 24px; cursor: pointer; padding: 0 5px;
         }
 
         .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #222;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #222;
         }
 
-        .task-item:last-child { border-bottom: none; }
-
-        /* Стиль переключателя как на скриншоте */
         .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
+            position: relative; display: inline-block; width: 46px; height: 26px;
         }
-
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333;
-            transition: .4s;
-            border-radius: 34px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .3s; border-radius: 34px;
         }
-
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px; width: 22px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 20px; width: 20px;
+            left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%;
         }
-
         input:checked + .slider { background-color: var(--accent-green); }
-        input:checked + .slider:before { transform: translateX(22px); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        input {
-            width: 100%;
-            background: #222;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            color: white;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+        input[type="text"], input[type="number"] {
+            width: 100%; background: #1c1c1e; border: none; border-radius: 10px;
+            padding: 14px; color: white; margin-bottom: 12px; font-size: 16px; box-sizing: border-box;
         }
 
-        .save-btn {
-            width: 100%;
-            background-color: var(--btn-blue);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+        .btn-ready {
+            width: 100%; background-color: var(--btn-blue); color: white;
+            border: none; padding: 16px; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
         }
     </style>
 </head>
@@ -134,9 +86,9 @@
     <div class="card">
         <div class="card-header">
             <span>Чек-лист</span>
-            <button class="add-btn" onclick="showAddTaskPrompt()">+</button>
+            <button class="add-btn" onclick="addNewTask()">+</button>
         </div>
-        <div id="tasks-container">
+        <div id="tasks-list">
             </div>
     </div>
 
@@ -144,55 +96,43 @@
         <div class="card-header">Отчет</div>
         <input type="text" id="comment" placeholder="Текст">
         <input type="number" id="mortgage" placeholder="Баланс ипотеки (₽)">
-        <button class="save-btn" onclick="saveDay()">✅ ГОТОВО</button>
+        <button class="btn-ready" onclick="submitDay()">✅ ГОТОВО</button>
     </div>
 
     <script>
-        // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ NGROK
-        const API_URL = 'https://flintily-wieldier-lauralee.ngrok-free.dev/api';
+        // ЗАМЕНИ НА СВОЙ АДРЕС NGROK
+        const API_BASE = 'https://flintily-wieldier-lauralee.ngrok-free.dev/api';
 
-        // 1. Загрузка задач из Java при старте
-        async function loadTasks() {
-            try {
-                const response = await fetch(`${API_URL}/tasks`);
-                const tasks = await response.json();
-                renderTasks(tasks);
-            } catch (e) {
-                console.error("Ошибка загрузки задач", e);
-                document.getElementById('tasks-container').innerHTML = "Ошибка связи с сервером";
-            }
+        // Загрузка данных при старте
+        async function init() {
+            await loadTasks();
+            await loadStreak();
         }
 
-        // 2. Отрисовка списка задач
-        function renderTasks(tasks) {
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = '';
+        async function loadTasks() {
+            const res = await fetch(`${API_BASE}/tasks`);
+            const tasks = await res.json();
+            const list = document.getElementById('tasks-list');
+            list.innerHTML = tasks.length ? '' : '<p style="color:#555">Нажми +, чтобы добавить цели</p>';
             
-            if (tasks.length === 0) {
-                container.innerHTML = '<div style="color:#555; padding:10px;">Задач пока нет. Нажми +</div>';
-                return;
-            }
-
             tasks.forEach(task => {
-                const div = document.createElement('div');
-                div.className = 'task-item';
-                div.innerHTML = `
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.innerHTML = `
                     <span>${task.taskName}</span>
                     <label class="switch">
                         <input type="checkbox" class="task-check" data-id="${task.id}">
                         <span class="slider"></span>
                     </label>
                 `;
-                container.appendChild(div);
+                list.appendChild(item);
             });
         }
 
-        // 3. Добавление новой задачи
-        async function showAddTaskPrompt() {
-            const name = prompt("Что добавим в цели на день?");
+        async function addNewTask() {
+            const name = prompt("Какую цель добавим?");
             if (!name) return;
-
-            await fetch(`${API_URL}/tasks/add`, {
+            await fetch(`${API_BASE}/tasks/add`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ taskName: name })
@@ -200,28 +140,35 @@
             loadTasks();
         }
 
-        // 4. Отправка отчета
-        async function saveDay() {
-            const report = {
+        async function submitDay() {
+            const checkedIds = Array.from(document.querySelectorAll('.task-check:checked'))
+                                    .map(el => parseInt(el.dataset.id));
+            
+            const data = {
                 comment: document.getElementById('comment').value,
                 mortgage: parseInt(document.getElementById('mortgage').value) || 0,
-                // Пока отправляем старые поля для совместимости, скоро обновим бэкенд
-                qaDone: document.querySelector('.task-check')?.checked || false
+                completedTaskIds: checkedIds
             };
 
-            const response = await fetch(`${API_URL}/save`, {
+            const res = await fetch(`${API_BASE}/save`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(report)
+                body: JSON.stringify(data)
             });
 
-            if (response.ok) {
-                alert("Отчет сохранен! Красавчик!");
+            if (res.ok) {
+                alert("Данные сохранены!");
+                loadStreak();
             }
         }
 
-        // Запуск при открытии
-        loadTasks();
+        async function loadStreak() {
+            const res = await fetch(`${API_BASE}/streak`);
+            const count = await res.json();
+            document.getElementById('streak').innerText = count;
+        }
+
+        init();
     </script>
 </body>
 </html>
