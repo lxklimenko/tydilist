@@ -2,159 +2,226 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker 2026</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TidyList - Трекер Дисциплины</title>
     <style>
         :root {
-            --bg-color: var(--tg-theme-bg-color, #1c1c1e);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #999999);
-            --button-color: var(--tg-theme-button-color, #2ea6ff);
-            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
-            --success-green: #34c759;
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --accent-green: #4cd964;
+            --text-main: #ffffff;
+            --text-gray: #888888;
+            --btn-blue: #5e5ce6;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0; padding: 16px; padding-bottom: 40px;
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 20px; margin: 0; }
+        .streak-count { font-size: 48px; font-weight: bold; color: var(--accent-green); margin: 5px 0; }
+        .streak-label { font-size: 14px; color: var(--text-gray); }
 
         .card {
-            background-color: var(--secondary-bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
-        h2 { font-size: 18px; margin: 0 0 12px 0; }
-        
-        .checkbox-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
         }
 
-        input[type="number"], textarea {
-            width: 100%; padding: 12px; border-radius: 8px; border: none;
-            background-color: var(--bg-color); color: var(--text-color);
-            box-sizing: border-box; font-size: 16px; margin-top: 8px;
+        .add-btn {
+            background: none;
+            border: none;
+            color: var(--btn-blue);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 10px;
         }
 
-        .main-btn {
-            background-color: #7d96f3; /* Цвет как на твоем скриншоте */
-            color: white;
-            width: 100%; padding: 16px; border-radius: 12px; border: none;
-            font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #222;
         }
 
-        /* Переключатель (Switch) */
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .task-item:last-child { border-bottom: none; }
+
+        /* Стиль переключателя как на скриншоте */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
         .switch input { opacity: 0; width: 0; height: 0; }
+
         .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #3e3e40; transition: .4s; border-radius: 34px;
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
         }
+
         .slider:before {
-            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px;
-            background-color: white; transition: .4s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 22px; width: 22px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
         }
-        input:checked + .slider { background-color: var(--success-green); }
+
+        input:checked + .slider { background-color: var(--accent-green); }
         input:checked + .slider:before { transform: translateX(22px); }
+
+        input {
+            width: 100%;
+            background: #222;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .save-btn {
+            width: 100%;
+            background-color: var(--btn-blue);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card" style="text-align: center;">
-        <h3 style="color: var(--hint-color); margin: 0;">Дней подряд</h3>
-        <h1 style="font-size: 48px; margin: 8px 0; color: var(--success-green);">0</h1>
+    <div class="header">
+        <div class="streak-label">Дней подряд</div>
+        <div class="streak-count" id="streak">0</div>
     </div>
 
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h2 style="margin: 0;">Чек-лист</h2>
-            <span style="color: var(--button-color); font-size: 28px; cursor: pointer; font-weight: bold;" onclick="addNewTask()">+</span>
+        <div class="card-header">
+            <span>Чек-лист</span>
+            <button class="add-btn" onclick="showAddTaskPrompt()">+</button>
         </div>
-        
-        <div id="taskList">
-            <div class="checkbox-item">
-                <span>QA: учеба</span>
-                <label class="switch"><input type="checkbox" id="qaCheck"><span class="slider"></span></label>
+        <div id="tasks-container">
             </div>
-            <div class="checkbox-item">
-                <span>Деньги: действия</span>
-                <label class="switch"><input type="checkbox" id="moneyCheck"><span class="slider"></span></label>
-            </div>
-            <div class="checkbox-item">
-                <span>Лег вовремя (до 00:00)</span>
-                <label class="switch"><input type="checkbox" id="sleepCheck"><span class="slider"></span></label>
-            </div>
-        </div>
     </div>
 
     <div class="card">
-        <h2>Отчет</h2>
-        <textarea id="dailyComment" rows="3" placeholder="Что сделано?"></textarea>
-        <input type="number" id="mortgageBalance" placeholder="Баланс ипотеки (₽)">
-        <button class="main-btn" onclick="sendData()" id="sendBtn">ЗАВЕРШИТЬ ДЕНЬ</button>
+        <div class="card-header">Отчет</div>
+        <input type="text" id="comment" placeholder="Текст">
+        <input type="number" id="mortgage" placeholder="Баланс ипотеки (₽)">
+        <button class="save-btn" onclick="saveDay()">✅ ГОТОВО</button>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ NGROK
+        const API_URL = 'https://flintily-wieldier-lauralee.ngrok-free.dev/api';
 
-        function addNewTask() {
-            const taskName = prompt("Введите название новой задачи:");
-            if (taskName) {
-                const taskList = document.getElementById('taskList');
-                const newTaskDiv = document.createElement('div');
-                newTaskDiv.className = 'checkbox-item';
-                newTaskDiv.innerHTML = `
-                    <span>${taskName}</span>
-                    <label class="switch"><input type="checkbox" class="extra-task" data-name="${taskName}"><span class="slider"></span></label>
-                `;
-                taskList.appendChild(newTaskDiv);
+        // 1. Загрузка задач из Java при старте
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_URL}/tasks`);
+                const tasks = await response.json();
+                renderTasks(tasks);
+            } catch (e) {
+                console.error("Ошибка загрузки задач", e);
+                document.getElementById('tasks-container').innerHTML = "Ошибка связи с сервером";
             }
         }
 
-        function sendData() {
-            const btn = document.getElementById('sendBtn');
-            const payload = {
-                qa_done: document.getElementById('qaCheck').checked,
-                money_done: document.getElementById('moneyCheck').checked,
-                sleep_on_time: document.getElementById('sleepCheck').checked,
-                comment: document.getElementById('dailyComment').value || "—",
-                mortgage: document.getElementById('mortgageBalance').value || "0"
-            };
+        // 2. Отрисовка списка задач
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<div style="color:#555; padding:10px;">Задач пока нет. Нажми +</div>';
+                return;
+            }
 
-            // Собираем доп. задачи из кнопки "+"
-            document.querySelectorAll('.extra-task').forEach(task => {
-                payload[task.getAttribute('data-name')] = task.checked;
-            });
-
-            btn.innerText = "⏳ Сохранение...";
-            btn.disabled = true;
-
-            // ЗАМЕНИ НА СВОЙ PRODUCTION URL
-            fetch('https://flintily-wieldier-lauralee.ngrok-free.dev/api/save', { 
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-})
-            .then(res => {
-                if (res.ok) {
-                    tg.showPopup({ title: 'Успех!', message: 'Данные в таблице', buttons: [{type: 'ok'}] });
-                    btn.innerText = "✅ ГОТОВО";
-                } else { throw new Error(); }
-            })
-            .catch(err => {
-                tg.showPopup({ title: 'Ошибка', message: 'Проверь n8n', buttons: [{type: 'ok'}] });
-                btn.innerText = "ЗАВЕРШИТЬ ДЕНЬ";
-                btn.disabled = false;
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                div.innerHTML = `
+                    <span>${task.taskName}</span>
+                    <label class="switch">
+                        <input type="checkbox" class="task-check" data-id="${task.id}">
+                        <span class="slider"></span>
+                    </label>
+                `;
+                container.appendChild(div);
             });
         }
+
+        // 3. Добавление новой задачи
+        async function showAddTaskPrompt() {
+            const name = prompt("Что добавим в цели на день?");
+            if (!name) return;
+
+            await fetch(`${API_URL}/tasks/add`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ taskName: name })
+            });
+            loadTasks();
+        }
+
+        // 4. Отправка отчета
+        async function saveDay() {
+            const report = {
+                comment: document.getElementById('comment').value,
+                mortgage: parseInt(document.getElementById('mortgage').value) || 0,
+                // Пока отправляем старые поля для совместимости, скоро обновим бэкенд
+                qaDone: document.querySelector('.task-check')?.checked || false
+            };
+
+            const response = await fetch(`${API_URL}/save`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(report)
+            });
+
+            if (response.ok) {
+                alert("Отчет сохранен! Красавчик!");
+            }
+        }
+
+        // Запуск при открытии
+        loadTasks();
     </script>
 </body>
 </html>
